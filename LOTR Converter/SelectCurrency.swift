@@ -32,15 +32,11 @@ struct SelectCurrency: View {
                     ForEach(currencies, id: \.self) { currency in
                         CurrencyIcon(
                             currency: currency.name,
-                            image: currency.image).background(
-                                RoundedRectangle(cornerRadius: 25)
-                                    .stroke(
-                                        fromCurrency == currency ?
-                                        Color.black : Color.clear, lineWidth: 5)
-                                    
-                                   
+                            image: currency.image).background(RoundedRectangle(cornerRadius: 25)
                             )
                             .shadow(radius: fromCurrency == currency ? 10 : 0)
+                            .overlay(RoundedRectangle(cornerRadius: 25).stroke(lineWidth: 3).opacity( fromCurrency == currency ? 0.5: 0.0)
+                            )
                             .onTapGesture {
                                 fromCurrency = currency
                             }

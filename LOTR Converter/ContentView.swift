@@ -85,12 +85,7 @@ struct ContentView: View {
                                 .frame(height:33)
                         }.padding(.bottom, -5).onTapGesture {
                             showCurrencySheet.toggle()
-                        }.sheet(isPresented: $showCurrencySheet, content: {
-                            SelectCurrency(
-                                fromCurrency: $fromCurrency,
-                                toCurrency: $toCurrency
-                            )
-                        })
+                        }
                         
                         TextField("Amount", value: $rightAmount, format: .number)
                             .keyboardType(.decimalPad)
@@ -117,6 +112,11 @@ struct ContentView: View {
                         
                 }.sheet(isPresented: $showExchangeInfo, content: {
                     ExchangeInfo()
+                }).sheet(isPresented: $showCurrencySheet, content: {
+                    SelectCurrency(
+                        fromCurrency: $fromCurrency,
+                        toCurrency: $toCurrency
+                    )
                 })
           
             }

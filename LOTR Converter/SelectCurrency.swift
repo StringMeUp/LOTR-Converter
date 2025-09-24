@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct SelectCurrency: View {
-    
+
     @Environment(\.dismiss) var dismiss
     
     let currencies: [Currency] = Currency.allCases
@@ -28,34 +28,10 @@ struct SelectCurrency: View {
             
             VStack(alignment: .leading, spacing: 20){
                 Text("Select the currency you are starting with:")
-                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]){
-                    ForEach(currencies, id: \.self) { currency in
-                        CurrencyIcon(
-                            currency: currency.name,
-                            image: currency.image).background(RoundedRectangle(cornerRadius: 25)
-                            )
-                            .shadow(radius: fromCurrency == currency ? 10 : 0)
-                            .overlay(RoundedRectangle(cornerRadius: 25).stroke(lineWidth: 3).opacity( fromCurrency == currency ? 0.5: 0.0)
-                            )
-                            .onTapGesture {
-                                fromCurrency = currency
-                            }
-                    }
-                }
+                IconGrid(currency: $fromCurrency)
                 
                 Text("Select the currency you would like to convert to:")
-                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]){
-                    ForEach(currencies, id: \.self) { currency in
-                        CurrencyIcon(currency: currency.name, image:currency.image).background(
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(toCurrency == currency ? Color.black : Color.clear, lineWidth: 5)
-                        )
-                        .shadow(radius: toCurrency == currency ? 10 : 0)
-                        .onTapGesture {
-                            toCurrency = currency
-                        }
-                    }
-                }
+                IconGrid(currency: $toCurrency)
                 
                 Button("Done") {
                     dismiss()

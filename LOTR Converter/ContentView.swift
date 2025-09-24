@@ -13,8 +13,8 @@ struct ContentView: View {
     @State private var rightAmount: Double?
     @State private var showExchangeInfo: Bool = false
     @State private var showCurrencySheet: Bool = false
-    @State private var fromCurrency: Currency = Currency.goldPiece
-    @State private var toCurrency: Currency = Currency.silverPenny
+    @State private var leftCurrency: Currency = Currency.goldPiece
+    @State private var rightCurrency: Currency = Currency.silverPenny
     
     var body: some View {
         ZStack {
@@ -41,21 +41,21 @@ struct ContentView: View {
                         //Currency
                         HStack {
                             //Currency image
-                            Image(fromCurrency.image)
+                            Image(leftCurrency.image)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:33)
                             
                             //Currency Text
-                            Text(fromCurrency.name)
+                            Text(leftCurrency.name)
                                 .font(.headline)
                                 .foregroundStyle(.white)
                         }.padding(.bottom, -5).onTapGesture {
                             showCurrencySheet.toggle()
                         }.sheet(isPresented: $showCurrencySheet, content: {
                             SelectCurrency(
-                                fromCurrency: $fromCurrency,
-                                toCurrency: $toCurrency
+                                fromCurrency: $leftCurrency,
+                                toCurrency: $rightCurrency
                             )
                         })
                 
@@ -75,11 +75,11 @@ struct ContentView: View {
                         //Currency
                         HStack {
                             //Currency Text
-                            Text(toCurrency.name)
+                            Text(rightCurrency.name)
                                 .font(.headline)
                                 .foregroundStyle(.white)
                             //Currency image
-                            Image(toCurrency.image)
+                            Image(rightCurrency.image)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:33)
@@ -114,24 +114,36 @@ struct ContentView: View {
                     ExchangeInfo()
                 }).sheet(isPresented: $showCurrencySheet, content: {
                     SelectCurrency(
-                        fromCurrency: $fromCurrency,
-                        toCurrency: $toCurrency
+                        fromCurrency: $leftCurrency,
+                        toCurrency: $rightCurrency
                     )
                 })
           
             }
         }
-        .onChange(of: leftAmount) { recalc() }
-        .onChange(of: fromCurrency) { recalc() }
-        .onChange(of: toCurrency) { recalc() }
+        .onChange(of: leftAmount) { calculateRightCurrency() }
+        .onChange(of: rightAmount) { calculateLeftCurrency() }
+        .onChange(of: leftCurrency) { calculateRightCurrency() }
+        .onChange(of: rightCurrency) { calculateLeftCurrency() }
     }
     
-    func recalc() {
+    func calculateRightCurrency() {
         guard let amount = leftAmount else {
             rightAmount = nil
             return
         }
-        rightAmount = fromCurrency.convert(amount: amount, to: toCurrency)
+        
+        rightAmount = leftCurrency.convert(amount: amount, to: rightCurrency)
+    
+    }
+    
+    func calculateLeftCurrency() {
+        guard let amount = rightAmount else {
+            leftAmount = nil
+            return
+        }
+        
+        leftAmount = rightCurrency.convert(amount: amount, to: leftCurrency)
     }
 }
 

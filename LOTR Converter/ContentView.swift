@@ -13,8 +13,8 @@ struct ContentView: View {
     @State private var rightAmount: Double?
     @State private var showExchangeInfo: Bool = false
     @State private var showCurrencySheet: Bool = false
-    @State private var fromCurrency: Currency? = Currency.goldPiece
-    @State private var toCurrency: Currency? = Currency.silverPenny
+    @State private var fromCurrency: Currency = Currency.goldPiece
+    @State private var toCurrency: Currency = Currency.silverPenny
     
     var body: some View {
         ZStack {
@@ -41,13 +41,13 @@ struct ContentView: View {
                         //Currency
                         HStack {
                             //Currency image
-                            Image(fromCurrency?.image ?? .silverpiece)
+                            Image(fromCurrency.image)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:33)
                             
                             //Currency Text
-                            Text(fromCurrency?.name ?? "Silver Piece")
+                            Text(fromCurrency.name)
                                 .font(.headline)
                                 .foregroundStyle(.white)
                         }.padding(.bottom, -5).onTapGesture {
@@ -75,11 +75,11 @@ struct ContentView: View {
                         //Currency
                         HStack {
                             //Currency Text
-                            Text(toCurrency?.name ?? "Gold Piece")
+                            Text(toCurrency.name)
                                 .font(.headline)
                                 .foregroundStyle(.white)
                             //Currency image
-                            Image(toCurrency?.image ?? .goldpiece)
+                            Image(toCurrency.image)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:33)
@@ -127,13 +127,11 @@ struct ContentView: View {
     }
     
     func recalc() {
-        guard let from = fromCurrency,
-              let to = toCurrency,
-              let amount = leftAmount else {
+        guard let amount = leftAmount else {
             rightAmount = nil
             return
         }
-        rightAmount = from.convert(amount: amount, to: to)
+        rightAmount = fromCurrency.convert(amount: amount, to: toCurrency)
     }
 }
 

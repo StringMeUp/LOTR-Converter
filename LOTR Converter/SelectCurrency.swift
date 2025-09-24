@@ -15,8 +15,8 @@ struct SelectCurrency: View {
     
     let currencies: [Currency] = Currency.allCases
     
-    @Binding var fromCurrency: Currency?
-    @Binding var toCurrency: Currency?
+    @Binding var fromCurrency: Currency
+    @Binding var toCurrency: Currency
     
     var body: some View {
         ZStack{
@@ -52,16 +52,10 @@ struct SelectCurrency: View {
     }
 }
 
-struct SelectCurrency_PreviewWrapper: View {
-    @State private var fromCurrency: Currency? = nil
-    @State private var toCurrency: Currency? = nil
-    
-    var body: some View {
-        SelectCurrency(fromCurrency: $fromCurrency, toCurrency: $toCurrency)
-    }
-}
 
 #Preview {
-    SelectCurrency_PreviewWrapper()
+    @Previewable @State var fromCurrency: Currency = .copperPenny
+    @Previewable @State var toCurrency: Currency = .goldPenny
+    SelectCurrency(fromCurrency:$fromCurrency, toCurrency: $toCurrency)
 }
 

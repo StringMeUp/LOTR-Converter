@@ -9,15 +9,17 @@ import SwiftUI
 import TipKit
 
 struct ContentView: View {
+
     //Stored property with @State
     @State private var leftAmount: Double?
     @State private var rightAmount: Double?
-    @FocusState private var isFocused: Bool
+    @FocusState private var focusField: Field?
     @State private var showExchangeInfo: Bool = false
     @State private var showCurrencySheet: Bool = false
     @State private var leftCurrency: Currency = Currency.goldPiece
     @State private var rightCurrency: Currency = Currency.silverPenny
     private let currencyTip = CurrencyTip()
+
     
     var body: some View {
         ZStack {
@@ -62,7 +64,7 @@ struct ContentView: View {
                         .popoverTip(currencyTip, arrowEdge: .bottom)
                         
                         TextField("Amount", value: $leftAmount, format: .number)
-                            .focused($isFocused)
+                            .focused($focusField, equals: .leftInput)
                             .textFieldStyle(.roundedBorder)
                     }
                     
@@ -94,7 +96,7 @@ struct ContentView: View {
                         .popoverTip(currencyTip, arrowEdge: .bottom)
                         
                         TextField("Amount", value: $rightAmount, format: .number)
-                            .focused($isFocused)
+                            .focused($focusField, equals: .rightInput)
                             .textFieldStyle(.roundedBorder)
                             .multilineTextAlignment(.trailing)
                         
@@ -124,12 +126,12 @@ struct ContentView: View {
             try? Tips.configure()
         }
         .onChange(of: leftAmount) {
-            if isFocused {
+            if focusField == .leftInput {
                 convertToRight()
             }
         }
         .onChange(of: rightAmount) {
-            if isFocused {
+            if focusField == .rightInput {
                 convertToLeft()
             }
         }
@@ -142,7 +144,9 @@ struct ContentView: View {
                 fromCurrency: $leftCurrency,
                 toCurrency: $rightCurrency
             )
-        })
+        }).onTapGesture {
+            focusField = nil
+        }
     }
     
     func convertToRight() {

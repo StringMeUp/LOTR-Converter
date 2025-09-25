@@ -16,11 +16,21 @@ struct ContentView: View {
     @FocusState private var focusField: Field?
     @State private var showExchangeInfo: Bool = false
     @State private var showCurrencySheet: Bool = false
-    @State private var leftCurrency: Currency = Currency.goldPiece
-    @State private var rightCurrency: Currency = Currency.silverPenny
+    @AppStorage("leftCurrency") private var leftCurrencyRaw: Double = Currency.goldPiece.rawValue
+    @AppStorage("rightCurrency") private var rightCurrencyRaw: Double = Currency.silverPiece.rawValue
+    
+    var leftCurrency: Currency {
+        get { Currency(rawValue: leftCurrencyRaw) ?? .goldPiece }
+        set { leftCurrencyRaw = newValue.rawValue }
+    }
+    
+    var rightCurrency: Currency {
+        get { Currency(rawValue: rightCurrencyRaw) ?? .silverPiece }
+        set { rightCurrencyRaw = newValue.rawValue }
+    }
+    
     private let currencyTip = CurrencyTip()
 
-    
     var body: some View {
         ZStack {
             //Backround image
@@ -141,8 +151,8 @@ struct ContentView: View {
             ExchangeInfo() })
         .sheet(isPresented: $showCurrencySheet, content: {
             SelectCurrency(
-                fromCurrency: $leftCurrency,
-                toCurrency: $rightCurrency
+                fromCurrencyRaw: $leftCurrencyRaw,
+                toCurrencyRaw: $rightCurrencyRaw
             )
         }).onTapGesture {
             focusField = nil
@@ -150,7 +160,7 @@ struct ContentView: View {
     }
     
     func convertToRight() {
-        rightAmount = leftCurrency.convert(amount: leftAmount, to: rightCurrency)
+        rightAmount = leftCurrency.convert(amount: leftAmount, to:  rightCurrency)
         
     }
     

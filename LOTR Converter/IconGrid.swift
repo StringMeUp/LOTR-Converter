@@ -11,7 +11,16 @@ import SwiftUI
 
 struct IconGrid: View {
     let currencies: [Currency] = Currency.allCases
-    @Binding var currency: Currency
+    @Binding var currencyRaw: Double
+    
+    var currency: Currency {
+        get {
+            Currency(rawValue: currencyRaw) ?? Currency.bronzePenny
+        }
+        set {
+            currencyRaw = Double(newValue.rawValue)
+        }
+    }
 
     var body: some View {
         LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]){
@@ -20,11 +29,11 @@ struct IconGrid: View {
                     currency: currency.name,
                     image: currency.image).background(RoundedRectangle(cornerRadius: 25)
                     )
-                    .shadow(radius: self.currency == currency ? 10 : 0)
-                    .overlay(RoundedRectangle(cornerRadius: 25).stroke(lineWidth: 3).opacity( self.currency == currency ? 0.5: 0.0)
+                    .shadow(radius: self.currencyRaw == currency.rawValue ? 10 : 0)
+                    .overlay(RoundedRectangle(cornerRadius: 25).stroke(lineWidth: 3).opacity( self.currencyRaw == currency.rawValue ? 0.5: 0.0)
                     )
                     .onTapGesture {
-                        self.currency = currency
+                        self.currencyRaw = currency.rawValue
                     }
             }
         }
@@ -32,7 +41,7 @@ struct IconGrid: View {
 }
 
 #Preview {
-    @Previewable @State var currency: Currency = .goldPiece
-    IconGrid(currency: $currency)
+    @Previewable @State var currency: Double = Currency.goldPiece.rawValue
+    IconGrid(currencyRaw: $currency)
 }
 

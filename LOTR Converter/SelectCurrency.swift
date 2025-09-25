@@ -15,8 +15,13 @@ struct SelectCurrency: View {
     
     let currencies: [Currency] = Currency.allCases
     
-    @Binding var fromCurrency: Currency
-    @Binding var toCurrency: Currency
+    @Binding var fromCurrencyRaw: Double
+    @Binding var toCurrencyRaw: Double
+    
+    var fromCurrency: Currency {
+        get {Currency(rawValue: fromCurrencyRaw) ?? Currency.goldPenny}
+        set {fromCurrencyRaw = newValue.rawValue}
+    }
     
     var body: some View {
         ZStack{
@@ -28,10 +33,10 @@ struct SelectCurrency: View {
             
             VStack(alignment: .leading, spacing: 20){
                 Text("Select the currency you are starting with:")
-                IconGrid(currency: $fromCurrency)
+                IconGrid(currencyRaw: $fromCurrencyRaw)
                 
                 Text("Select the currency you would like to convert to:")
-                IconGrid(currency: $toCurrency)
+                IconGrid(currencyRaw: $toCurrencyRaw)
                 
                 Button("Done") {
                     dismiss()
@@ -54,8 +59,8 @@ struct SelectCurrency: View {
 
 
 #Preview {
-    @Previewable @State var fromCurrency: Currency = .copperPenny
-    @Previewable @State var toCurrency: Currency = .goldPenny
-    SelectCurrency(fromCurrency:$fromCurrency, toCurrency: $toCurrency)
+    @Previewable @State var fromCurrency: Double = Currency.copperPenny.rawValue
+    @Previewable @State var toCurrency: Double = Currency.goldPenny.rawValue
+    SelectCurrency(fromCurrencyRaw: $fromCurrency, toCurrencyRaw: $toCurrency)
 }
 

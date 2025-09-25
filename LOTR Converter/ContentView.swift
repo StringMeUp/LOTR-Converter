@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct ContentView: View {
     //Stored property with @State
@@ -16,6 +17,7 @@ struct ContentView: View {
     @State private var showCurrencySheet: Bool = false
     @State private var leftCurrency: Currency = Currency.goldPiece
     @State private var rightCurrency: Currency = Currency.silverPenny
+    private let currencyTip = CurrencyTip()
     
     var body: some View {
         ZStack {
@@ -51,14 +53,13 @@ struct ContentView: View {
                             Text(leftCurrency.name)
                                 .font(.headline)
                                 .foregroundStyle(.white)
-                        }.padding(.bottom, -5).onTapGesture {
+                        }
+                        .padding(.bottom, -5)
+                        .onTapGesture {
                             showCurrencySheet.toggle()
-                        }.sheet(isPresented: $showCurrencySheet, content: {
-                            SelectCurrency(
-                                fromCurrency: $leftCurrency,
-                                toCurrency: $rightCurrency
-                            )
-                        })
+                            currencyTip.invalidate(reason: .actionPerformed)
+                        }
+                        .popoverTip(currencyTip, arrowEdge: .bottom)
                         
                         TextField("Amount", value: $leftAmount, format: .number)
                             .focused($isFocused)
@@ -84,9 +85,13 @@ struct ContentView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:33)
-                        }.padding(.bottom, -5).onTapGesture {
-                            showCurrencySheet.toggle()
                         }
+                        .padding(.bottom, -5)
+                        .onTapGesture {
+                            showCurrencySheet.toggle()
+                            currencyTip.invalidate(reason: .actionPerformed)
+                        }
+                        .popoverTip(currencyTip, arrowEdge: .bottom)
                         
                         TextField("Amount", value: $rightAmount, format: .number)
                             .focused($isFocused)
@@ -114,6 +119,9 @@ struct ContentView: View {
                 }
                 
             }.keyboardType(.decimalPad)
+        }
+        .task {
+            try? Tips.configure()
         }
         .onChange(of: leftAmount) {
             if isFocused {

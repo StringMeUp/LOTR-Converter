@@ -48,7 +48,8 @@ enum Currency: Double, CaseIterable, Identifiable {
         }
     }
     
-    func convert(amount: Double, to target: Currency) -> Double {
-        amount * (target.rawValue / self.rawValue)
+    func convert(amount: Double?, to target: Currency) -> Double? {
+        guard let _amount = amount else { return nil }
+        return _amount * (target.rawValue / self.rawValue)
     }
 }

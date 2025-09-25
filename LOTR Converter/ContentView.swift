@@ -11,6 +11,7 @@ struct ContentView: View {
     //Stored property with @State
     @State private var leftAmount: Double?
     @State private var rightAmount: Double?
+    @FocusState private var isFocused: Bool
     @State private var showExchangeInfo: Bool = false
     @State private var showCurrencySheet: Bool = false
     @State private var leftCurrency: Currency = Currency.goldPiece
@@ -22,7 +23,7 @@ struct ContentView: View {
             Image(.background)
                 .resizable()
                 .ignoresSafeArea()
-        
+            
             VStack {
                 Image(.prancingpony)
                     .resizable()
@@ -58,9 +59,9 @@ struct ContentView: View {
                                 toCurrency: $rightCurrency
                             )
                         })
-                
+                        
                         TextField("Amount", value: $leftAmount, format: .number)
-                            .keyboardType(.decimalPad)
+                            .focused($isFocused)
                             .textFieldStyle(.roundedBorder)
                     }
                     
@@ -88,10 +89,10 @@ struct ContentView: View {
                         }
                         
                         TextField("Amount", value: $rightAmount, format: .number)
-                            .keyboardType(.decimalPad)
+                            .focused($isFocused)
                             .textFieldStyle(.roundedBorder)
                             .multilineTextAlignment(.trailing)
-                
+                        
                     }
                 }.padding()
                     .background(.black.opacity(0.5))
@@ -109,41 +110,40 @@ struct ContentView: View {
                     }.font(.largeTitle)
                         .foregroundStyle(.white)
                         .padding(.trailing)
-                        
-                }.sheet(isPresented: $showExchangeInfo, content: {
-                    ExchangeInfo()
-                }).sheet(isPresented: $showCurrencySheet, content: {
-                    SelectCurrency(
-                        fromCurrency: $leftCurrency,
-                        toCurrency: $rightCurrency
-                    )
-                })
-          
+                    
+                }
+                
+            }.keyboardType(.decimalPad)
+        }
+        .onChange(of: leftAmount) {
+            if isFocused {
+                convertToRight()
             }
         }
-        .onChange(of: leftAmount) { calculateRightCurrency() }
-        .onChange(of: rightAmount) { calculateLeftCurrency() }
-        .onChange(of: leftCurrency) { calculateRightCurrency() }
-        .onChange(of: rightCurrency) { calculateLeftCurrency() }
+        .onChange(of: rightAmount) {
+            if isFocused {
+                convertToLeft()
+            }
+        }
+        .onChange(of: leftCurrency) { convertToRight() }
+        .onChange(of: rightCurrency) { convertToLeft() }
+        .sheet(isPresented: $showExchangeInfo, content: {
+            ExchangeInfo() })
+        .sheet(isPresented: $showCurrencySheet, content: {
+            SelectCurrency(
+                fromCurrency: $leftCurrency,
+                toCurrency: $rightCurrency
+            )
+        })
     }
     
-    func calculateRightCurrency() {
-        guard let amount = leftAmount else {
-            rightAmount = nil
-            return
-        }
+    func convertToRight() {
+        rightAmount = leftCurrency.convert(amount: leftAmount, to: rightCurrency)
         
-        rightAmount = leftCurrency.convert(amount: amount, to: rightCurrency)
-    
     }
     
-    func calculateLeftCurrency() {
-        guard let amount = rightAmount else {
-            leftAmount = nil
-            return
-        }
-        
-        leftAmount = rightCurrency.convert(amount: amount, to: leftCurrency)
+    func convertToLeft() {
+        leftAmount = rightCurrency.convert(amount: rightAmount, to: leftCurrency)
     }
 }
 

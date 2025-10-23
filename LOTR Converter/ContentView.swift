@@ -53,29 +53,16 @@ struct ContentView: View {
                 HStack {
                     //Left
                     VStack(alignment: HorizontalAlignment.leading) {
-                        //Currency
-                        HStack {
-                            //Currency image
-                            Image(leftCurrency.image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:33)
-                            
-                            //Currency Text
-                            Text(leftCurrency.name)
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                        }
-                        .padding(.bottom, -5)
-                        .onTapGesture {
-                            showCurrencySheet.toggle()
-                            currencyTip.invalidate(reason: .actionPerformed)
-                        }
-                        .popoverTip(currencyTip, arrowEdge: .bottom)
-                        
-                        TextField("Amount", value: $leftAmount, format: .number)
-                            .focused($focusField, equals: .leftInput)
-                            .textFieldStyle(.roundedBorder)
+                        ConversionSection(
+                            currencyAmount: $leftAmount  ,
+                            currency: Binding(
+                                get: { leftCurrency },
+                                set: { leftCurrencyRaw = $0.rawValue }
+                            ),
+                            focusField: $focusField,
+                            showCurrencySheet: $showCurrencySheet,
+                            field: Field.leftInput
+                        )
                     }
                     
                     //Equal sign
@@ -85,36 +72,25 @@ struct ContentView: View {
                         .symbolEffect(.pulse)
                     
                     //Right
-                    VStack(alignment: .trailing) {
-                        //Currency
-                        HStack {
-                            //Currency Text
-                            Text(rightCurrency.name)
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                            //Currency image
-                            Image(rightCurrency.image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:33)
-                        }
-                        .padding(.bottom, -5)
-                        .onTapGesture {
-                            showCurrencySheet.toggle()
-                            currencyTip.invalidate(reason: .actionPerformed)
-                        }
-                        .popoverTip(currencyTip, arrowEdge: .bottom)
-                        
-                        TextField("Amount", value: $rightAmount, format: .number)
-                            .focused($focusField, equals: .rightInput)
-                            .textFieldStyle(.roundedBorder)
-                            .multilineTextAlignment(.trailing)
-                        
+                    VStack(alignment: HorizontalAlignment.trailing) {
+                        ConversionSection(
+                            currencyAmount: $rightAmount,
+                            currency: Binding(
+                                get: { rightCurrency },
+                                set: { rightCurrencyRaw = $0.rawValue }
+                            ),
+                            focusField: $focusField,
+                            showCurrencySheet: $showCurrencySheet,
+                            field: Field.rightInput
+                        )
                     }
-                }.padding()
-                    .background(.black.opacity(0.5))
-                    .clipShape(Capsule())
+                }
+                .padding()
+                .background(.black.opacity(0.5))
+                .clipShape(Capsule())
+                
                 Spacer()
+                
                 //Info Button
                 HStack {
                     Spacer()
@@ -129,7 +105,6 @@ struct ContentView: View {
                         .padding(.trailing)
                     
                 }
-                
             }.keyboardType(.decimalPad)
         }
         .task {
@@ -160,12 +135,14 @@ struct ContentView: View {
     }
     
     func convertToRight() {
-        rightAmount = leftCurrency.convert(amount: leftAmount, to:  rightCurrency)
+        rightAmount = leftCurrency
+            .convert(amount: leftAmount, to:  rightCurrency)
         
     }
     
     func convertToLeft() {
-        leftAmount = rightCurrency.convert(amount: rightAmount, to: leftCurrency)
+        leftAmount = rightCurrency
+            .convert(amount: rightAmount, to: leftCurrency)
     }
 }
 
